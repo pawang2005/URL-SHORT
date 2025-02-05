@@ -3,7 +3,7 @@ const path = require('path');
 const mongoose = require('mongoose');
 const URL = require('./model/user');
 const { generateShortURL, handleGetAnalytics } = require('./controller/control');
-
+require("dotenv").config()
 const app = express();
 
 app.use(express.json());
