@@ -12,7 +12,7 @@ app.use(express.urlencoded({ extended: false }));
 app.set('view engine', 'ejs');
 app.set('views', path.resolve('./views'));
 
-mongoose.connect(process.env.MONGO_URL)
+mongoose.connect("mongodb+srv://pawangupta5692:Pawan7208@cluster0.zbfjc.mongodb.net/URL-SHORT")
     .then(() => { console.log('Connected to MongoDB'); })
     .catch(err => { console.error('MongoDB connection error:', err); });
 
