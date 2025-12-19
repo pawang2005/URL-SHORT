@@ -5,6 +5,9 @@ const URL = require('./model/user');
 const { generateShortURL, handleGetAnalytics } = require('./controller/control');
 require("dotenv").config()
 const app = express();
+const bodyParser = require('body-parser');
+
+app.use(bodyParser.json());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -18,7 +21,7 @@ mongoose.connect("mongodb+srv://pawangupta5692:Pawan7208@cluster0.zbfjc.mongodb.
 
 app.get('/', async (req, res) => {
     const urls = await URL.find({});
-    res.render('home', { id: null, urls });
+    res.render('home_test', { id: null, urls ,data:""});
 });
 
 app.post('/', generateShortURL);

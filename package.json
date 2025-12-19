@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "nodemon index.js",
     "vercel-build": "node index.js"
   },
   "author": "",
@@ -17,7 +17,7 @@
     "mongoose": "^8.3.4",
     "nanoid": "^5.0.7",
     "node": "^20.14.0",
-    "nodemon": "^3.1.0",
+    "nodemon": "^3.1.11",
     "shortid": "^2.2.16"
   }
 }

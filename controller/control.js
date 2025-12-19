@@ -3,18 +3,33 @@ const URL = require('../model/user');
 
 async function generateShortURL(req, res) {
     const body = req.body;
+    const shortId = "";
+    const urls = await URL.find({});
+
     if (!body.url) return res.status(400).json({ error: "URL is required" });
-    
-    const shortId = shortid.generate();
-    
+
+    const customURL = body.custom;
+
+    if(body.custom){
+        await URL.findOne({shortId:customURL}).then(()=>{
+            return res.render('home_test',{data:"Id already in use",id:null, urls});
+        }).catch(()=>{
+            shortId = customURL;
+        });
+    }
+
+    else{
+        shortId = shortid.generate();
+    }
+
     await URL.create({
         shortId: shortId,
         redirectURL: body.url,
         visitHistory: [],
     });
 
-    const urls = await URL.find({});
-    res.render('home', { id: shortId, urls });
+    
+    res.render('home_test', { id: shortId, urls,data:"" });
 }
 
 async function handleGetAnalytics(req, res) {
