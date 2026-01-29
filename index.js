@@ -1,46 +1,65 @@
-const express = require('express');
-const path = require('path');
-const mongoose = require('mongoose');
-const URL = require('./model/user');
-const { generateShortURL, handleGetAnalytics } = require('./controller/control');
-require("dotenv").config()
-const app = express();
-const bodyParser = require('body-parser');
+const express = require("express");
+const path = require("path");
+const mongoose = require("mongoose");
+const userData = require("./model/userdata");
+const { requireAuth } = require("./requireAuth");
 
-app.use(bodyParser.json());
+const cookieParser = require("cookie-parser");
+const { checkForAuthentication } = require("./checkAuth.js");
+
+require("dotenv").config();
+const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 
-app.set('view engine', 'ejs');
-app.set('views', path.resolve('./views'));
+// 🔍 Detect user from token (does NOT block)
+app.use(checkForAuthentication("token"));
 
-mongoose.connect("mongodb+srv://pawangupta5692:Pawan7208@cluster0.zbfjc.mongodb.net/URL-SHORT")
-    .then(() => { console.log('Connected to MongoDB'); })
-    .catch(err => { console.error('MongoDB connection error:', err); });
+app.set("view engine", "ejs");
+app.set("views", path.resolve("./views"));
 
-app.get('/', async (req, res) => {
-    const urls = await URL.find({});
-    res.render('home_test', { id: null, urls ,data:""});
+
+app.get("/signin", (req, res) => {
+  return res.render("signin");
 });
 
-app.post('/', generateShortURL);
+app.post("/signin", async (req, res) => {
+  try {
+    const { email, password } = req.body;
 
-app.get('/analytics/:shortId', handleGetAnalytics);
-
-app.get('/:shortId', async (req, res) => {
-    const shortId = req.params.shortId;
-    const entry = await URL.findOneAndUpdate(
-        { shortId },
-        { $push: { visitHistory: { timestamp: Date.now() } } },
-        { new: true }
-    );
-
-    if (entry) {
-        res.redirect(entry.redirectURL);
-    } else {
-        res.status(404).send('URL not found');
-    }
+    const token = await userData.matchPassword(email, password);
+    res.cookie("token", token);
+    return res.redirect("/");
+  } catch (error) {
+    return res.render("signin", { error: "Invalid email or password" });
+  }
 });
 
-app.listen(3000, () => { console.log('Server Started on port 3000'); });
+app.get("/signup", (req, res) => {
+  return res.render("signup");
+});
+
+app.post("/signup", async (req, res) => {
+  const { name, password, email, date } = req.body;
+
+  const prevUser = await userData.findOne({ email });
+  if (prevUser) {
+    return res.render("signup", { message: "Email Already Exists" });
+  }
+
+  await userData.create({ name, email, date, password });
+  return res.redirect("/signin");
+});
+
+app.use("/", requireAuth, require("./routes/user"));
+
+mongoose
+  .connect("mongodb://localhost:27017/URL-SHORT")
+  .then(() => console.log("Connected to MongoDB"))
+  .catch(console.error);
+
+app.listen(3000, () => {
+  console.log("Server Started on port 3000");
+});
