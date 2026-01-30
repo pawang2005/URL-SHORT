@@ -20,7 +20,6 @@ app.use(checkForAuthentication("token"));
 app.set("view engine", "ejs");
 app.set("views", path.resolve("./views"));
 
-
 app.get("/signin", (req, res) => {
   return res.render("signin");
 });
@@ -56,10 +55,10 @@ app.post("/signup", async (req, res) => {
 app.use("/", requireAuth, require("./routes/user"));
 
 mongoose
-  .connect("mongodb://localhost:27017/URL-SHORT")
+  .connect("mongodb+srv://pawgup:Pawan123@cluster0.zbfjc.mongodb.net/")
   .then(() => console.log("Connected to MongoDB"))
   .catch(console.error);
 
-app.listen(3000, () => {
+app.listen(8080, () => {
   console.log("Server Started on port 3000");
 });

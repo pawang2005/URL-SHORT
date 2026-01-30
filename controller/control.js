@@ -23,6 +23,7 @@ async function generateShortURL(req, res) {
         data: "Id already in use",
         id: null,
         urls,
+        username: userDetails.name,
       });
     }
     shortId = customURL;
@@ -49,6 +50,7 @@ async function generateShortURL(req, res) {
     id: shortId,
     urls: urls_final,
     data: "",
+    username: userDetails.name,
   });
 }
 
